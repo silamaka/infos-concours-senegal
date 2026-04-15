@@ -1,0 +1,43 @@
+from django.urls import path
+
+from .views import (
+    AdminAuditLogsView,
+    AdminAnnaleDetailView,
+    AdminAnnalesView,
+    AdminConcoursDetailView,
+    AdminConcoursView,
+    AdminContactDetailView,
+    AdminContactsView,
+    AdminImageUploadView,
+    AdminPdfUploadView,
+    AdminOverviewView,
+    AdminOrderDetailView,
+    AdminOrdersView,
+    AdminPaymentsView,
+    AdminServiceDetailView,
+    AdminServicesView,
+    AdminStatsView,
+    AdminUserDetailView,
+    AdminUsersView,
+)
+
+urlpatterns = [
+    path("overview/", AdminOverviewView.as_view(), name="admin-overview"),
+    path("stats/", AdminStatsView.as_view(), name="admin-stats"),
+    path("audit-logs/", AdminAuditLogsView.as_view(), name="admin-audit-logs"),
+    path("annales/", AdminAnnalesView.as_view(), name="admin-annales"),
+    path("annales/<uuid:pk>/", AdminAnnaleDetailView.as_view(), name="admin-annales-detail"),
+    path("concours/", AdminConcoursView.as_view(), name="admin-concours"),
+    path("concours/<uuid:pk>/", AdminConcoursDetailView.as_view(), name="admin-concours-detail"),
+    path("orders/", AdminOrdersView.as_view(), name="admin-orders"),
+    path("orders/<uuid:pk>/", AdminOrderDetailView.as_view(), name="admin-orders-detail"),
+    path("payments/", AdminPaymentsView.as_view(), name="admin-payments"),
+    path("services/", AdminServicesView.as_view(), name="admin-services"),
+    path("services/<uuid:pk>/", AdminServiceDetailView.as_view(), name="admin-services-detail"),
+    path("users/", AdminUsersView.as_view(), name="admin-users"),
+    path("users/<uuid:pk>/", AdminUserDetailView.as_view(), name="admin-users-detail"),
+    path("contact/", AdminContactsView.as_view(), name="admin-contact"),
+    path("contact/<uuid:pk>/", AdminContactDetailView.as_view(), name="admin-contact-detail"),
+    path("upload/image/", AdminImageUploadView.as_view(), name="admin-upload-image"),
+    path("upload/pdf/", AdminPdfUploadView.as_view(), name="admin-upload-pdf"),
+]
