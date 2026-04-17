@@ -6,7 +6,7 @@ let refreshInFlight: Promise<string | null> | null = null;
 
 interface RequestOptions {
   method?: string;
-  body?: unknown;
+  body?: unknown | FormData;
   headers?: Record<string, string>;
 }
 
@@ -104,6 +104,7 @@ export interface ServiceRequestPayload {
   phone: string;
   target?: string;
   details: string;
+  file?: File | null;
 }
 
 export interface ServiceRequest {
@@ -114,6 +115,8 @@ export interface ServiceRequest {
   phone: string;
   target: string;
   details: string;
+  attachment_file?: string | null;
+  attachment_file_url?: string | null;
   status: "submitted" | "in_progress" | "delivered";
   created_at: string;
 }
@@ -223,6 +226,8 @@ export interface AdminServiceRequest {
   phone: string;
   target: string;
   details: string;
+  attachment_file?: string | null;
+  attachment_file_url?: string | null;
   status: "submitted" | "in_progress" | "delivered";
   user_email?: string | null;
   created_at: string;
@@ -315,14 +320,25 @@ export async function apiFetch<T>(endpoint: string, options: RequestOptions = {}
   const { method = "GET", body, headers = {} } = options;
   const makeRequest = async (tokenOverride?: string | null) => {
     const token = tokenOverride ?? localStorage.getItem(ACCESS_TOKEN_KEY);
+    
+    // Préparer les headers
+    const requestHeaders: Record<string, string> = {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...headers,
+    };
+    
+    // Ajouter Content-Type seulement si ce n'est pas FormData
+    if (!(body instanceof FormData)) {
+      requestHeaders["Content-Type"] = "application/json";
+    }
+    
+    // Préparer le body
+    const requestBody = body instanceof FormData ? body : (body ? JSON.stringify(body) : undefined);
+    
     return fetch(`${API_BASE_URL}${endpoint}`, {
       method,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...headers,
-      },
-      ...(body ? { body: JSON.stringify(body) } : {}),
+      headers: requestHeaders,
+      ...(requestBody ? { body: requestBody } : {}),
     });
   };
 
@@ -512,9 +528,23 @@ export async function submitContactApi(payload: ContactPayload): Promise<{ messa
 }
 
 export async function submitServiceRequestApi(payload: ServiceRequestPayload): Promise<ServiceRequest> {
+  const formData = new FormData();
+  
+  // Ajouter tous les champs textuels
+  Object.entries(payload).forEach(([key, value]) => {
+    if (key !== 'file' && value !== undefined && value !== null) {
+      formData.append(key, value);
+    }
+  });
+  
+  // Ajouter le fichier s'il existe
+  if (payload.file) {
+    formData.append('attachment_file', payload.file);
+  }
+  
   return apiFetch<ServiceRequest>("/services/", {
     method: "POST",
-    body: payload,
+    body: formData,
   });
 }
 

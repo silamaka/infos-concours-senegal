@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 export default function Payment() {
   const { items, totalPrice, clearCart } = useCart();
-  const [method, setMethod] = useState<'wave' | 'orange'>('wave');
+  const [method, setMethod] = useState<'paydunya'>('paydunya');
   const [phone, setPhone] = useState('');
   const [success, setSuccess] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
@@ -67,9 +67,7 @@ export default function Payment() {
             Ouvrir le lien de paiement
           </a>
         )}
-        <Link to="/dashboard" className="inline-flex gradient-hero text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity">
-          Aller au tableau de bord
-        </Link>
+        
       </div>
     );
   }
@@ -110,19 +108,12 @@ export default function Payment() {
 
         <form onSubmit={handlePay} className="bg-card/95 backdrop-blur-md border border-border rounded-2xl p-6 space-y-4 shadow-card">
           <h3 className="font-heading font-semibold">Mode de paiement</h3>
-          <div className="flex gap-3">
-            {(['wave', 'orange'] as const).map(m => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMethod(m)}
-                className={`flex-1 py-3 rounded-lg border text-sm font-semibold transition-colors ${
-                  method === m ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground hover:bg-muted'
-                }`}
-              >
-                {m === 'wave' ? '🌊 Wave' : '🟠 Orange Money'}
-              </button>
-            ))}
+          <div className="py-3 px-4 rounded-lg border border-primary bg-primary/5 text-primary text-center">
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">P</div>
+              <span className="font-semibold">Paydunya</span>
+            </div>
+            <p className="text-xs text-primary/70 mt-1">Wave, Orange Money et plus</p>
           </div>
           <div>
             <label htmlFor="payment-phone" className="text-sm font-medium mb-1 block">Numéro de téléphone</label>

@@ -14,6 +14,7 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
             "phone",
             "target",
             "details",
+            "attachment_file",
             "status",
             "created_at",
         ]

@@ -25,7 +25,7 @@ def _load_env_file() -> None:
 _load_env_file()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-secret-key")
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+DEBUG = True
 
 
 def env_bool(name: str, default: bool) -> bool:
@@ -91,24 +91,17 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-if os.getenv("DB_ENGINE", "sqlite").lower() == "postgres":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME", "infos-concours"),
-            "USER": os.getenv("DB_USER", "infos-concours"),
-            "PASSWORD": os.getenv("DB_PASSWORD", "infos-concours"),
-            "HOST": os.getenv("DB_HOST", "localhost"),
-            "PORT": os.getenv("DB_PORT", "5432"),
-        }
+# Configuration PostgreSQL uniquement
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME", "infos-concours"),
+        "USER": os.getenv("DB_USER", "infos-concours"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "infos-concours"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -171,7 +164,7 @@ REST_FRAMEWORK = {
         "auth": "5/min",
         "contact": "3/hour",
     },
-    "EXCEPTION_HANDLER": "apps.core.exception_handler.api_exception_handler",
+    # "EXCEPTION_HANDLER": "apps.core.exception_handler.api_exception_handler",
 }
 
 SIMPLE_JWT = {
@@ -184,6 +177,45 @@ SIMPLE_JWT = {
 
 LOGIN_FAILURE_LIMIT = int(os.getenv("LOGIN_FAILURE_LIMIT", "5"))
 LOGIN_LOCKOUT_SECONDS = int(os.getenv("LOGIN_LOCKOUT_SECONDS", "900"))
+
+# Configuration Logging explicite
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'DEBUG',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'apps': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
 
 if os.getenv("REDIS_URL"):
     CACHES = {

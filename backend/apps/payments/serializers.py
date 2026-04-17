@@ -5,7 +5,7 @@ from .models import Payment
 
 class PaymentInitiateSerializer(serializers.Serializer):
     order_id = serializers.UUIDField()
-    provider = serializers.ChoiceField(choices=["wave", "orange"])
+    provider = serializers.ChoiceField(choices=["paydunya"])
     phone = serializers.CharField(max_length=32)
 
 

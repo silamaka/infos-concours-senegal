@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Send, FileText, PenTool, Palette, CheckCircle, Star, ArrowRight, Sparkles, Shield, Clock, Users, Zap } from 'lucide-react';
+import { Send, FileText, PenTool, Palette, CheckCircle, Star, ArrowRight, Sparkles, Shield, Clock, Users, Zap, Paperclip } from 'lucide-react';
 import { toast } from 'sonner';
 import { submitServiceRequestApi } from '@/utils/api';
 
@@ -38,19 +38,62 @@ export default function Services() {
     email: '',
     target: '',
     details: '',
+    // Champs spécifiques CV
+    experience: '',
+    formation: '',
+    // Champs spécifiques Design
+    dimensions: '',
+    style: '',
+    usage: '',
+    // Fichier optionnel
+    file: null as File | null,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await submitServiceRequestApi({
+      // Créer un objet de données de base
+      const baseData = {
         service_type: selectedService,
         name: form.name,
         email: form.email,
         phone: form.phone,
         target: form.target,
         details: form.details,
+      };
+
+      // Ajouter les champs spécifiques selon le service
+      let enrichedData = { ...baseData };
+      
+      if (selectedService === 'cv') {
+        enrichedData = {
+          ...enrichedData,
+          details: `${baseData.details}\n\nExpérience: ${form.experience}\nFormation: ${form.formation}`,
+        };
+      } else if (selectedService === 'design') {
+        enrichedData = {
+          ...enrichedData,
+          details: `${baseData.details}\n\nDimensions: ${form.dimensions}\nStyle: ${form.style}\nUsage: ${form.usage}`,
+        };
+      }
+
+      // Ajouter l'information sur le fichier si présent
+      if (form.file) {
+        enrichedData = {
+          ...enrichedData,
+          details: `${enrichedData.details}\n\nFichier joint: ${form.file.name} (${(form.file.size / 1024 / 1024).toFixed(1)}MB)`,
+        };
+      }
+
+      await submitServiceRequestApi({
+        service_type: selectedService,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        target: form.target,
+        details: enrichedData.details,
+        file: form.file,
       });
       setSubmitted(true);
       toast.success('Demande envoyée !');
@@ -291,8 +334,94 @@ export default function Services() {
                 value={form.details}
                 onChange={e => setForm(prev => ({ ...prev, details: e.target.value }))}
                 className="w-full px-4 py-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none transition-shadow"
-                placeholder="Décrivez vos besoins, votre parcours, le poste visé..."
+                placeholder={selectedService === 'cv' ? 'Décrivez votre parcours, vos compétences, le poste visé...' : selectedService === 'design' ? 'Décrivez votre projet, vos préférences, l\'usage prévu...' : 'Décrivez vos besoins, votre parcours, le poste visé...'}
               />
+            </div>
+
+            {/* Champs spécifiques selon le service */}
+            {selectedService === 'cv' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Années d'expérience</label>
+                  <input
+                    value={form.experience}
+                    onChange={e => setForm(prev => ({ ...prev, experience: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
+                    placeholder="Ex: 3 ans"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Formation principale</label>
+                  <input
+                    value={form.formation}
+                    onChange={e => setForm(prev => ({ ...prev, formation: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
+                    placeholder="Ex: Licence en informatique"
+                  />
+                </div>
+              </div>
+            )}
+
+            {selectedService === 'design' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium mb-1.5 block">Dimensions souhaitées</label>
+                    <input
+                      value={form.dimensions}
+                      onChange={e => setForm(prev => ({ ...prev, dimensions: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
+                      placeholder="Ex: A4, 1080x1080px, carré Instagram"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1.5 block">Style/Thème</label>
+                    <input
+                      value={form.style}
+                      onChange={e => setForm(prev => ({ ...prev, style: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
+                      placeholder="Ex: Moderne, Élégant, Coloré, Minimaliste"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Usage prévu</label>
+                  <select
+                    value={form.usage}
+                    onChange={e => setForm(prev => ({ ...prev, usage: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
+                  >
+                    <option value="">Sélectionnez l'usage</option>
+                    <option value="web">Web / Réseaux sociaux</option>
+                    <option value="print">Impression / Affiche</option>
+                    <option value="logo">Logo / Identité visuelle</option>
+                    <option value="presentation">Présentation / PowerPoint</option>
+                    <option value="other">Autre</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Fichier optionnel pour tous les services */}
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">
+                Fichier joint (optionnel)
+                <span className="text-xs text-muted-foreground ml-2">PDF, Word, Image - Max 10MB</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  onChange={e => setForm(prev => ({ ...prev, file: e.target.files?.[0] || null }))}
+                  className="w-full px-4 py-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-shadow file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                />
+                {form.file && (
+                  <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                    <Paperclip className="h-3 w-3" />
+                    {form.file.name} ({(form.file.size / 1024 / 1024).toFixed(1)}MB)
+                  </div>
+                )}
+              </div>
             </div>
             <button disabled={loading} type="submit" className="w-full flex items-center justify-center gap-2 gradient-hero text-primary-foreground py-4 rounded-xl font-bold text-base hover:opacity-90 transition-opacity shadow-lg disabled:opacity-60">
               <Send className="h-5 w-5" /> {loading ? 'Envoi en cours...' : `Envoyer ma demande — ${selected.price}`}

@@ -41,7 +41,16 @@ export default function Dashboard() {
   const handleDownload = async (annaleId: string) => {
     try {
       const payload = await getAnnaleDownloadApi(annaleId);
-      window.open(payload.url, '_blank', 'noopener,noreferrer');
+      
+      // Crée un lien temporaire pour forcer le téléchargement
+      const link = document.createElement('a');
+      link.href = payload.url;
+      link.download = `annale-${annaleId}.pdf`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
       toast.success('Téléchargement démarré.');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Téléchargement impossible.';

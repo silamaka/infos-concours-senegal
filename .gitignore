@@ -1,29 +1,96 @@
+# =========================
+# DJANGO / PYTHON
+# =========================
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environnements virtuels
+venv/
+env/
+.venv/
+
+# Variables d'environnement (IMPORTANT)
+.env
+
+# Base de données locale
+db.sqlite3
+db.sqlite3-journal
+
 # Logs
-logs
 *.log
+
+# Fichiers temporaires
+*.swp
+*.swo
+
+# Migrations compilées
+*.pyc
+
+# Fichiers statiques collectés
+staticfiles/
+
+# Fichiers media (uploads utilisateurs)
+media/
+
+# =========================
+# REACT / NODE
+# =========================
+
+# Dépendances Node
+node_modules/
+
+# Build React
+build/
+dist/
+
+# Logs Node
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Fichiers d'environnement React
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# =========================
+# IDE / EDITEURS
+# =========================
+
+# VS Code
+.vscode/
+
+# JetBrains (PyCharm, WebStorm)
+.idea/
+
+# =========================
+# SYSTEME
+# =========================
+
+# Mac
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
 
-# Environment files
-.env
-.env.*
-backend/.env
+# Windows
+Thumbs.db
+
+# =========================
+# TESTS / CACHE
+# =========================
+
+coverage/
+htmlcov/
+.cache/
+pytest_cache/
+
+# =========================
+# DIVERS
+# =========================
+
+# Fichiers temporaires généraux
+*.tmp
+*.bak
+*.old

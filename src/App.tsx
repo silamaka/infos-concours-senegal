@@ -21,6 +21,8 @@ const CatalogAnnales = lazy(() => import("./pages/CatalogAnnales"));
 const AnnaleDetail = lazy(() => import("./pages/AnnaleDetail"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Payment = lazy(() => import("./pages/Payment"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentCancel = lazy(() => import("./pages/PaymentCancel"));
 const Services = lazy(() => import("./pages/Services"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Contact = lazy(() => import("./pages/Contact"));
@@ -57,6 +59,8 @@ function AppRoutes() {
         <Route path="/annales/:id" element={<AnnaleDetail />} />
         <Route path="/panier" element={<Cart />} />
         <Route path="/paiement" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+        <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+        <Route path="/payment/cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
         <Route path="/services" element={<Services />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route

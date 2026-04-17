@@ -92,6 +92,7 @@ class AdminPaymentSerializer(serializers.ModelSerializer):
 
 class AdminServiceSerializer(serializers.ModelSerializer):
     user_email = serializers.EmailField(source="user.email", allow_null=True, read_only=True)
+    attachment_file_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ServiceRequest
@@ -103,10 +104,20 @@ class AdminServiceSerializer(serializers.ModelSerializer):
             "phone",
             "target",
             "details",
+            "attachment_file",
+            "attachment_file_url",
             "status",
             "user_email",
             "created_at",
         ]
+
+    def get_attachment_file_url(self, obj):
+        if obj.attachment_file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.attachment_file.url)
+            return obj.attachment_file.url
+        return None
 
 
 class AdminUserSerializer(serializers.ModelSerializer):

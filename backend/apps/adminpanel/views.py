@@ -41,7 +41,7 @@ from .serializers import (
 audit_logger = logging.getLogger("apps.adminpanel.audit")
 
 
-def record_admin_audit(request, action: str, target_type: str, target_id: str = "", details: dict | None = None):
+def record_admin_audit(request, action: str, target_type: str, target_id: str = "", details: dict = None):
     payload = details or {}
     try:
         AdminAuditLog.objects.create(

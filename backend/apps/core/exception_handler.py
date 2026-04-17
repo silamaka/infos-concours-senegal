@@ -25,7 +25,7 @@ def _normalize_error(detail: Any) -> str:
     return str(detail)
 
 
-def api_exception_handler(exc: Exception, context: dict[str, Any]) -> Response | None:
+def api_exception_handler(exc: Exception, context: dict) -> Response:
     response = drf_exception_handler(exc, context)
     if response is None:
         return Response({"message": "Erreur interne du serveur"}, status=500)
