@@ -92,6 +92,7 @@ export default function ConcoursAdmin() {
       registration_url: registrationUrl,
       image: (form.image ?? '').trim(),
       is_featured: !!form.is_featured,
+      conditions: typeof form.conditions === 'string' ? form.conditions : '',
     };
 
     try {

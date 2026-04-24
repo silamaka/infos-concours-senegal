@@ -21,7 +21,7 @@ export default function PageHero({
   stats = [],
 }: PageHeroProps) {
   return (
-    <section className="relative overflow-hidden rounded-[2rem] border border-border bg-card/85 px-6 py-8 shadow-card backdrop-blur-xl md:px-8 md:py-10">
+    <section className="relative overflow-hidden rounded-[2rem] border border-border bg-card/85 px-6 pt-0 pb-2 shadow-card backdrop-blur-xl md:px-8 md:pt-0 md:pb-3">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,hsl(145_63%_32%_/_0.12),transparent_38%),radial-gradient(circle_at_bottom_right,hsl(45_100%_51%_/_0.14),transparent_34%)]" aria-hidden="true" />
       <div className="relative">
         <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">

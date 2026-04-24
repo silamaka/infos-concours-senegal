@@ -37,6 +37,7 @@ class AdminAnnaleSerializer(serializers.ModelSerializer):
             "pdf_key",
             "created_at",
             "updated_at",
+            "features"
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
@@ -76,6 +77,7 @@ class AdminConcoursSerializer(serializers.ModelSerializer):
             "is_featured",
             "created_at",
             "updated_at",
+             "conditions",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
