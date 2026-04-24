@@ -9,6 +9,7 @@ class AnnaleAdmin(admin.ModelAdmin):
     list_display = ("title", "category", "price", "is_popular", "is_new", "year")
     list_filter = ("category", "is_popular", "is_new", "year")
     search_fields = ("title", "category")
+    fields = ("title", "category", "price", "old_price", "is_popular", "is_new", "year", "description", "features", "pages", "image", "preview_url", "pdf_key")
 
 
 @admin.register(Pack)

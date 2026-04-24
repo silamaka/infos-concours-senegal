@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ShoppingCart, Eye, Star, Download, FileText, Calendar, BookOpen, Share2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { Annale, getAnnaleByIdApi, getAnnalesApi } from '@/utils/api';
 import { useCart } from '@/contexts/CartContext';
 import BadgePopulaire from '@/components/BadgePopulaire';
@@ -121,16 +122,14 @@ export default function AnnaleDetail() {
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">{annale.description}</p>
               </div>
-              <div className="border-t border-border pt-5">
-                <h2 className="text-lg font-heading font-semibold mb-3">Ce que contient cette annale</h2>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {['Sujets officiels complets', 'Corrigés détaillés', 'Conseils méthodologiques', 'Barème de notation'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" /> {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {annale.features && annale.features.trim() && (
+                <div className="border-t border-border pt-5">
+                  <h2 className="text-lg font-heading font-semibold mb-3">Ce que contient cette annale</h2>
+                  <div className="prose prose-sm max-w-none text-muted-foreground">
+                    <ReactMarkdown>{annale.features}</ReactMarkdown>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

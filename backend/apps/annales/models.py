@@ -21,6 +21,8 @@ class Annale(models.Model):
     preview_url = models.URLField(blank=True)
     pdf_key = models.CharField(max_length=512, blank=True)
 
+    features = models.TextField("Ce que contient cette annale", blank=True, help_text="Texte libre, markdown ou HTML autorisé.")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

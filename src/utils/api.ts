@@ -41,6 +41,7 @@ export interface Annale {
   downloads?: number;
   image?: string;
   preview_url?: string;
+  features?: string;
 }
 
 export interface Concours {
@@ -181,6 +182,7 @@ export interface AdminAnnale {
   pdf_key?: string;
   created_at?: string;
   updated_at?: string;
+  features?: string;
 }
 
 export interface AdminConcours {

@@ -19,6 +19,7 @@ const initialForm: Partial<AdminAnnale> = {
   isPopular: false,
   isNew: false,
   description: '',
+  features: '',
   pages: 0,
   year: new Date().getFullYear(),
   image: '',
@@ -79,6 +80,7 @@ export default function AnnalesAdmin() {
       oldPrice: normalizedOldPrice,
       pages: Number(form.pages ?? 0),
       year: Number(form.year ?? new Date().getFullYear()),
+      features: (form.features ?? '').trim(),
     };
 
     try {
@@ -105,6 +107,7 @@ export default function AnnalesAdmin() {
       image: item.image ?? '',
       preview_url: item.preview_url ?? '',
       description: item.description ?? '',
+      features: item.features ?? '',
       pages: item.pages ?? 0,
       year: item.year ?? new Date().getFullYear(),
       pdf_key: item.pdf_key ?? '',
@@ -262,6 +265,15 @@ export default function AnnalesAdmin() {
             <div className="md:col-span-2">
               <label className="text-xs text-muted-foreground">Description (optionnel)</label>
               <textarea value={form.description ?? ''} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} placeholder="Décris brièvement le contenu de l'annale" className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background text-sm min-h-[80px]" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-xs text-muted-foreground">Ce que contient cette annale (markdown ou HTML autorisé)</label>
+              <textarea
+                value={form.features ?? ''}
+                onChange={(e) => setForm((p) => ({ ...p, features: e.target.value }))}
+                placeholder={"Exemple :\n- Sujets officiels complets\n- Corrigés détaillés\n- Conseils méthodologiques\n- Barème de notation"}
+                className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background text-sm min-h-[80px]"
+              />
             </div>
             <div>
               <label className="text-xs text-muted-foreground flex items-center justify-between">URL aperçu PDF (optionnel) <span className={`text-[11px] ${isHttpUrl(form.preview_url) ? 'text-emerald-600' : 'text-muted-foreground'}`}>{isHttpUrl(form.preview_url) ? 'Valide' : 'http(s) attendu'}</span></label>

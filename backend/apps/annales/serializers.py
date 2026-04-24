@@ -24,6 +24,7 @@ class AnnaleSerializer(serializers.ModelSerializer):
             "isPopular",
             "isNew",
             "description",
+            "features",
             "pages",
             "year",
             "average_rating",
