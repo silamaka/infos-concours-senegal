@@ -8,6 +8,11 @@ import BadgeNouveau from '@/components/BadgeNouveau';
 import ModalPDFPreview from '@/components/ModalPDFPreview';
 import { toast } from 'sonner';
 
+function isNotFoundMessage(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return normalized.includes('404') || normalized.includes('not found') || normalized.includes('introuvable');
+}
+
 export default function AnnaleDetail() {
   const { id } = useParams();
   const [annale, setAnnale] = useState<Annale | null>(null);
@@ -15,21 +20,31 @@ export default function AnnaleDetail() {
   const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
   const [showPreview, setShowPreview] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setLoading(false);
+      setErrorMessage("Identifiant de l'annale manquant.");
+      return;
+    }
     let mounted = true;
     const loadData = async () => {
+      if (mounted) {
+        setLoading(true);
+        setErrorMessage(null);
+      }
       try {
         const detail = await getAnnaleByIdApi(id);
         const list = await getAnnalesApi();
         if (!mounted) return;
         setAnnale(detail);
         setRelatedAnnales(list.filter(a => a.id !== detail.id && a.category === detail.category).slice(0, 3));
-      } catch {
+      } catch (err) {
         if (!mounted) return;
         setAnnale(null);
         setRelatedAnnales([]);
+        setErrorMessage(err instanceof Error ? err.message : "Chargement de l'annale impossible.");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -49,9 +64,10 @@ export default function AnnaleDetail() {
   }
 
   if (!annale) {
+    const isNotFound = isNotFoundMessage(errorMessage || '');
     return (
       <div className="container py-20 text-center">
-        <p className="text-muted-foreground">Annale introuvable.</p>
+        <p className="text-muted-foreground">{isNotFound ? 'Annale introuvable.' : (errorMessage || "Chargement de l'annale impossible.")}</p>
         <Link to="/annales" className="text-primary text-sm hover:underline mt-4 inline-block">← Retour au catalogue</Link>
       </div>
     );

@@ -4,9 +4,9 @@ import { toast } from 'sonner';
 import { submitServiceRequestApi } from '@/utils/api';
 
 const services = [
-  { id: 'cv', label: 'Rédaction de CV', icon: FileText, price: '5 000 FCFA', description: 'CV professionnel adapté au marché sénégalais et international.', features: ['Design moderne & épuré', 'Optimisé ATS', 'Format PDF & Word', 'Livraison sous 48h'], color: 'primary' },
-  { id: 'lettre', label: 'Lettre de motivation', icon: PenTool, price: '3 500 FCFA', description: 'Lettre percutante qui capte l\'attention des recruteurs.', features: ['Personnalisée au poste', 'Structure argumentée', 'Ton professionnel', 'Livraison sous 48h'], color: 'secondary' },
-  { id: 'design', label: 'Création graphique', icon: Palette, price: '10 000 FCFA', description: 'Supports graphiques pour vos projets et candidatures.', features: ['Flyers & affiches', 'Logos personnalisés', 'Posts réseaux sociaux', 'Fichiers source inclus'], color: 'accent' },
+  { id: 'cv', label: 'Rédaction de CV', icon: FileText, price: '3 000 FCFA', description: 'CV professionnel adapté au marché sénégalais et international.', features: ['Design moderne & épuré', 'Optimisé ATS', 'Format PDF & Word', 'Livraison sous 48h'], color: 'primary' },
+  { id: 'lettre', label: 'Lettre de motivation', icon: PenTool, price: '2 500 FCFA', description: 'Lettre percutante qui capte l\'attention des recruteurs.', features: ['Personnalisée au poste', 'Structure argumentée', 'Ton professionnel', 'Livraison sous 48h'], color: 'secondary' },
+  { id: 'design', label: 'Création graphique', icon: Palette, price: '5 000 FCFA', description: 'Supports graphiques pour vos projets et candidatures.', features: ['Flyers & affiches', 'Logos personnalisés', 'Posts réseaux sociaux', 'Fichiers source inclus'], color: 'accent' },
 ];
 
 const testimonials = [

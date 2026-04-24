@@ -26,3 +26,20 @@ class Annale(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+# --- Reviews/Notes ---
+from django.conf import settings
+
+class Review(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    annale = models.ForeignKey(Annale, on_delete=models.CASCADE, related_name="review_set")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reviews")
+    rating = models.PositiveSmallIntegerField(default=5)
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("annale", "user")
+        ordering = ["-created_at"]

@@ -49,6 +49,7 @@ export interface Concours {
   category: string;
   date: string;
   description: string;
+  registration_url?: string;
   location: string;
   deadline: string;
   status: string;
@@ -56,6 +57,7 @@ export interface Concours {
   rating?: number;
   reviews?: number;
   is_featured?: boolean;
+  conditions?: string;
 }
 
 export interface OrderItemPayload {
@@ -187,11 +189,13 @@ export interface AdminConcours {
   category: string;
   date: string;
   description: string;
+  registration_url?: string;
   location: string;
   deadline: string;
   status: string;
   image?: string;
   is_featured?: boolean;
+  conditions?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -293,6 +297,13 @@ export interface AdminImageUploadResponse {
   path: string;
 }
 
+interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
 interface RefreshResponse {
   access: string;
   refresh?: string;
@@ -320,21 +331,17 @@ export async function apiFetch<T>(endpoint: string, options: RequestOptions = {}
   const { method = "GET", body, headers = {} } = options;
   const makeRequest = async (tokenOverride?: string | null) => {
     const token = tokenOverride ?? localStorage.getItem(ACCESS_TOKEN_KEY);
-    
     // Préparer les headers
     const requestHeaders: Record<string, string> = {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     };
-    
     // Ajouter Content-Type seulement si ce n'est pas FormData
     if (!(body instanceof FormData)) {
       requestHeaders["Content-Type"] = "application/json";
     }
-    
     // Préparer le body
     const requestBody = body instanceof FormData ? body : (body ? JSON.stringify(body) : undefined);
-    
     return fetch(`${API_BASE_URL}${endpoint}`, {
       method,
       headers: requestHeaders,
@@ -349,6 +356,15 @@ export async function apiFetch<T>(endpoint: string, options: RequestOptions = {}
     if (nextToken) {
       res = await makeRequest(nextToken);
     }
+  }
+
+  // Si toujours 401 après refresh, forcer la déconnexion et rediriger vers /login
+  if (res.status === 401) {
+    clearAuthTokens();
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
+    throw new Error('Session expirée. Veuillez vous reconnecter.');
   }
 
   if (!res.ok) {
@@ -465,7 +481,8 @@ export async function meApi(): Promise<ApiUser> {
 }
 
 export async function getAnnalesApi(): Promise<Annale[]> {
-  return apiFetch<Annale[]>("/annales/");
+  const payload = await apiFetch<Annale[] | PaginatedResponse<Annale>>("/annales/");
+  return Array.isArray(payload) ? payload : (payload?.results || []);
 }
 
 export async function getAnnaleByIdApi(id: string): Promise<Annale> {
@@ -473,7 +490,8 @@ export async function getAnnaleByIdApi(id: string): Promise<Annale> {
 }
 
 export async function getConcoursApi(): Promise<Concours[]> {
-  return apiFetch<Concours[]>("/concours/");
+  const payload = await apiFetch<Concours[] | PaginatedResponse<Concours>>("/concours/");
+  return Array.isArray(payload) ? payload : (payload?.results || []);
 }
 
 export async function getConcoursByIdApi(id: string): Promise<Concours> {
@@ -488,12 +506,13 @@ export async function createOrderApi(items: OrderItemPayload[]): Promise<Order> 
 }
 
 export async function getMyOrdersApi(): Promise<Order[]> {
-  return apiFetch<Order[]>("/orders/me/");
+  const payload = await apiFetch<Order[] | PaginatedResponse<Order>>("/orders/me/");
+  return Array.isArray(payload) ? payload : (payload?.results || []);
 }
 
 export async function initiatePaymentApi(
   orderId: string,
-  provider: "wave" | "orange",
+  provider: "wave" | "orange" | "paydunya",
   phone: string,
 ): Promise<PaymentInitiateResponse> {
   return apiFetch<PaymentInitiateResponse>("/payments/initiate/", {
@@ -637,7 +656,8 @@ export async function getAdminStatsApi(): Promise<AdminStats> {
 }
 
 export async function getAdminAnnalesApi(): Promise<AdminAnnale[]> {
-  return apiFetch<AdminAnnale[]>("/admin/annales/");
+  const payload = await apiFetch<AdminAnnale[] | PaginatedResponse<AdminAnnale>>("/admin/annales/");
+  return Array.isArray(payload) ? payload : (payload?.results || []);
 }
 
 export async function createAdminAnnaleApi(payload: Partial<AdminAnnale>): Promise<AdminAnnale> {
@@ -659,7 +679,8 @@ export async function deleteAdminAnnaleApi(id: string): Promise<void> {
 }
 
 export async function getAdminConcoursApi(): Promise<AdminConcours[]> {
-  return apiFetch<AdminConcours[]>("/admin/concours/");
+  const payload = await apiFetch<AdminConcours[] | PaginatedResponse<AdminConcours>>("/admin/concours/");
+  return Array.isArray(payload) ? payload : (payload?.results || []);
 }
 
 export async function createAdminConcoursApi(payload: Partial<AdminConcours>): Promise<AdminConcours> {
@@ -681,7 +702,8 @@ export async function deleteAdminConcoursApi(id: string): Promise<void> {
 }
 
 export async function getAdminOrdersApi(): Promise<AdminOrder[]> {
-  return apiFetch<AdminOrder[]>("/admin/orders/");
+  const payload = await apiFetch<AdminOrder[] | PaginatedResponse<AdminOrder>>("/admin/orders/");
+  return Array.isArray(payload) ? payload : (payload?.results || []);
 }
 
 export async function updateAdminOrderApi(id: string, status: AdminOrder["status"]): Promise<AdminOrder> {
@@ -692,15 +714,18 @@ export async function updateAdminOrderApi(id: string, status: AdminOrder["status
 }
 
 export async function getAdminPaymentsApi(): Promise<AdminPayment[]> {
-  return apiFetch<AdminPayment[]>("/admin/payments/");
+  const payload = await apiFetch<AdminPayment[] | PaginatedResponse<AdminPayment>>("/admin/payments/");
+  return Array.isArray(payload) ? payload : (payload?.results || []);
 }
 
 export async function getAdminAuditLogsApi(): Promise<AdminAuditLog[]> {
-  return apiFetch<AdminAuditLog[]>("/admin/audit-logs/");
+  const payload = await apiFetch<AdminAuditLog[] | PaginatedResponse<AdminAuditLog>>("/admin/audit-logs/");
+  return Array.isArray(payload) ? payload : (payload?.results || []);
 }
 
 export async function getAdminServicesApi(): Promise<AdminServiceRequest[]> {
-  return apiFetch<AdminServiceRequest[]>("/admin/services/");
+  const payload = await apiFetch<AdminServiceRequest[] | PaginatedResponse<AdminServiceRequest>>("/admin/services/");
+  return Array.isArray(payload) ? payload : (payload?.results || []);
 }
 
 export async function updateAdminServiceApi(

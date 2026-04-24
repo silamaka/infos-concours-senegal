@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from urllib.parse import urlparse, unquote
 
 from apps.annales.models import Annale
 from apps.concours.models import Concours
@@ -39,6 +40,22 @@ class AdminAnnaleSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
+    def validate_pdf_key(self, value: str) -> str:
+        """Stocke un chemin relatif stable (pas une URL complète)."""
+        if not value:
+            return value
+
+        parsed = urlparse(value)
+        candidate = parsed.path if parsed.scheme else value
+        candidate = unquote(candidate).replace("\\", "/").lstrip("/")
+
+        if candidate.startswith("media/"):
+            candidate = candidate[len("media/"):]
+        if candidate.startswith("annales/"):
+            candidate = candidate[len("annales/"):]
+
+        return candidate
+
 
 class AdminConcoursSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,6 +66,7 @@ class AdminConcoursSerializer(serializers.ModelSerializer):
             "category",
             "date",
             "description",
+            "registration_url",
             "location",
             "deadline",
             "status",

@@ -76,7 +76,7 @@ export default function Login() {
           </div>
 
           {error && (
-            <div className="bg-destructive/10 text-destructive text-sm rounded-lg p-3 mb-6">{error}</div>
+            <div role="alert" className="bg-destructive/10 text-destructive text-sm rounded-lg p-3 mb-6">{error}</div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -87,6 +87,8 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
+                autoComplete="email"
+                aria-invalid={Boolean(error)}
                 required
                 placeholder="votre@email.com"
                 className="w-full px-4 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -100,11 +102,18 @@ export default function Login() {
                   type={showPw ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  aria-invalid={Boolean(error)}
                   required
                   placeholder="••••••••"
                   className="w-full px-4 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring pr-10"
                 />
-                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm"
+                  aria-label={showPw ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                >
                   {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>

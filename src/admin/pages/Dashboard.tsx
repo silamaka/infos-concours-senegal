@@ -25,11 +25,19 @@ export default function Dashboard() {
   const [error, setError] = useState('');
 
   const loadDashboard = useCallback(async () => {
-    const [statsPayload, overviewPayload, auditPayload] = await Promise.all([
+    const [statsPayload, overviewPayload] = await Promise.all([
       getAdminStatsApi(),
       getAdminOverviewApi(),
-      getAdminAuditLogsApi(),
     ]);
+
+    let auditPayload: AdminAuditLog[] = [];
+    try {
+      auditPayload = await getAdminAuditLogsApi();
+    } catch {
+      // Endpoint réservé aux admins : on garde le dashboard opérationnel pour le staff.
+      auditPayload = [];
+    }
+
     setStats(statsPayload);
     setOverview(overviewPayload);
     setAuditLogs(auditPayload.slice(0, 8));

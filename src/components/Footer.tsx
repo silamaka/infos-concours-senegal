@@ -55,15 +55,15 @@ export default function Footer() {
               La plateforme N°1 au Sénégal pour les concours, emplois, bourses et ressources pédagogiques.
             </p>
 
-            <div className="flex items-center gap-3 mt-6">
+            <div className="flex items-center gap-3 mt-6" aria-label="Réseaux sociaux">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={social.label}
-                  className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors inline-flex items-center justify-center hover:-translate-y-0.5 duration-200"
+                  aria-label={`Ouvrir ${social.label}`}
+                  className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors inline-flex items-center justify-center hover:-translate-y-0.5 duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-senegal-yellow"
                 >
                   <social.icon className="h-4 w-4" />
                 </a>
@@ -73,13 +73,13 @@ export default function Footer() {
 
           <div>
             <h4 className="font-heading text-xl text-senegal-yellow mb-5">Navigation</h4>
-            <div className="flex flex-col gap-2">
+            <nav className="flex flex-col gap-2" aria-label="Navigation du pied de page">
               {navLinks.map((l) => (
-                <Link key={l.to} to={l.to} className="text-slate-300 hover:text-white transition-all text-base hover:translate-x-0.5">
+                <Link key={l.to} to={l.to} className="text-slate-300 hover:text-white transition-all text-base hover:translate-x-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-senegal-yellow rounded-sm">
                   {l.label}
                 </Link>
               ))}
-            </div>
+            </nav>
           </div>
 
           <div>
@@ -98,15 +98,27 @@ export default function Footer() {
             <div className="flex flex-col gap-4 text-slate-300">
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-senegal-green" />
-                <span>+221 70 887 17 26</span>
+                <a href="tel:+221708871726" className="hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-senegal-yellow rounded-sm">
+                  +221 70 887 17 26
+                </a>
               </div>
               <div className="flex items-start gap-2">
                 <MessageCircle className="h-4 w-4 text-senegal-green mt-1" />
-                <span>WhatsApp disponible</span>
+                <a
+                  href="https://wa.me/221708871726"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-senegal-yellow rounded-sm"
+                  aria-label="Contacter sur WhatsApp"
+                >
+                  WhatsApp disponible
+                </a>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-senegal-yellow" />
-                <span>contact@infosconcours.sn</span>
+                <a href="mailto:contact@infosconcours.sn" className="hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-senegal-yellow rounded-sm">
+                  contact@infosconcours.sn
+                </a>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-senegal-red" />

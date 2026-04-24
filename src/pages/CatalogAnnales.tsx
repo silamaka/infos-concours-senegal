@@ -16,6 +16,7 @@ export default function CatalogAnnales() {
   const [error, setError] = useState<string | null>(null);
   const [reloadTick, setReloadTick] = useState(0);
 
+
   useEffect(() => {
     let mounted = true;
     const loadAnnales = async () => {
@@ -23,7 +24,8 @@ export default function CatalogAnnales() {
       setError(null);
       try {
         const data = await getAnnalesApi();
-        if (mounted) setAnnales(data);
+        // Compatibilité pagination DRF
+        if (mounted) setAnnales(Array.isArray(data) ? data : (data?.results || []));
       } catch (err: unknown) {
         if (mounted) setAnnales([]);
         if (mounted) setError(err instanceof Error ? err.message : 'Chargement des annales impossible.');

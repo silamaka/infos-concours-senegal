@@ -82,8 +82,8 @@ def test_admin_can_access_admin_audit_logs(api_client: APIClient, admin_user: Us
     res = api_client.get(url)
 
     assert res.status_code == 200
-    assert isinstance(res.data, list)
-    assert any(item["action"] == "admin_user_updated" for item in res.data)
+    rows = res.data if isinstance(res.data, list) else res.data.get("results", [])
+    assert any(item["action"] == "admin_user_updated" for item in rows)
 
 
 @pytest.mark.django_db

@@ -43,6 +43,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Accessibilite: focus trap sur menu utilisateur, fermeture mobile menu par Echap
   useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
       if (!userMenu) return;
@@ -57,11 +58,30 @@ export default function Navbar() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setUserMenu(false);
+        setOpen(false);
+      }
+      // Focus trap menu utilisateur
+      if (userMenu && event.key === 'Tab' && userMenuRef.current) {
+        const focusable = userMenuRef.current.querySelectorAll<HTMLElement>(
+          'a,button,[tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     };
 
     document.addEventListener('mousedown', onPointerDown);
     document.addEventListener('keydown', onKeyDown);
+    // Focus sur bouton menu utilisateur à l’ouverture
+    if (userMenu) setTimeout(() => { userMenuButtonRef.current?.focus(); }, 100);
     return () => {
       document.removeEventListener('mousedown', onPointerDown);
       document.removeEventListener('keydown', onKeyDown);
@@ -139,7 +159,7 @@ export default function Navbar() {
                   <Link to="/dashboard" role="menuitem" onClick={() => setUserMenu(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted transition-colors">
                     <User className="h-4 w-4" /> Mon compte
                   </Link>
-                  {user.role === 'ADMIN' && (
+                  {(user.role === 'ADMIN' || user.role === 'STAFF') && (
                     <Link to="/admin" role="menuitem" onClick={() => setUserMenu(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted transition-colors">
                       <ShieldCheck className="h-4 w-4" /> Admin
                     </Link>
@@ -201,7 +221,7 @@ export default function Navbar() {
                 <Link to="/dashboard" onClick={() => setOpen(false)} className="px-4 py-3 rounded-xl text-sm font-medium text-foreground/70 hover:bg-muted">
                   Mon compte
                 </Link>
-                {user.role === 'ADMIN' && (
+                {(user.role === 'ADMIN' || user.role === 'STAFF') && (
                   <Link to="/admin" onClick={() => setOpen(false)} className="px-4 py-3 rounded-xl text-sm font-medium text-foreground/70 hover:bg-muted">
                     Admin
                   </Link>

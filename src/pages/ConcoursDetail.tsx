@@ -4,26 +4,41 @@ import { ArrowLeft, Calendar, MapPin, FileText, Clock, Star, Users, Share2, Book
 import { Concours, getConcoursApi, getConcoursByIdApi } from '@/utils/api';
 import { toast } from 'sonner';
 
+function isNotFoundMessage(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return normalized.includes('404') || normalized.includes('not found') || normalized.includes('introuvable');
+}
+
 export default function ConcoursDetail() {
   const { id } = useParams();
   const [concours, setConcours] = useState<Concours | null>(null);
   const [relatedConcours, setRelatedConcours] = useState<Concours[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setLoading(false);
+      setErrorMessage('Identifiant du concours manquant.');
+      return;
+    }
     let mounted = true;
     const loadData = async () => {
+      if (mounted) {
+        setLoading(true);
+        setErrorMessage(null);
+      }
       try {
         const detail = await getConcoursByIdApi(id);
         const list = await getConcoursApi();
         if (!mounted) return;
         setConcours(detail);
         setRelatedConcours(list.filter(c => c.id !== detail.id && c.category === detail.category).slice(0, 3));
-      } catch {
+      } catch (err) {
         if (!mounted) return;
         setConcours(null);
         setRelatedConcours([]);
+        setErrorMessage(err instanceof Error ? err.message : 'Chargement du concours impossible.');
       } finally {
         if (mounted) setLoading(false);
       }
@@ -43,9 +58,10 @@ export default function ConcoursDetail() {
   }
 
   if (!concours) {
+    const isNotFound = isNotFoundMessage(errorMessage || '');
     return (
       <div className="container py-20 text-center">
-        <p className="text-muted-foreground">Concours introuvable.</p>
+        <p className="text-muted-foreground">{isNotFound ? 'Concours introuvable.' : (errorMessage || 'Chargement du concours impossible.')}</p>
         <Link to="/concours" className="text-primary text-sm hover:underline mt-4 inline-block">← Retour aux concours</Link>
       </div>
     );
@@ -56,6 +72,15 @@ export default function ConcoursDetail() {
     : concours.status === 'À venir'
       ? 'bg-secondary/10 text-secondary-foreground border-secondary/20'
       : 'bg-muted text-muted-foreground border-border';
+
+  const handleRegisterClick = () => {
+    const url = (concours.registration_url || '').trim();
+    if (!url) {
+      toast.error("Lien d'inscription indisponible pour ce concours.");
+      return;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div className="py-6 md:py-10">
@@ -103,15 +128,18 @@ export default function ConcoursDetail() {
               </div>
               <div className="border-t border-border pt-5">
                 <h2 className="text-lg font-heading font-semibold mb-2 flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" /> Conditions requises
+                  <Users className="h-5 w-5 text-primary" /> Pièces à Fournir
                 </h2>
                 <ul className="space-y-2">
-                  {['Nationalité sénégalaise', 'Dossier complet', 'Respect des dates officielles'].map((req, i) => (
+                  {(concours.conditions || '').split('\n').filter(Boolean).map((req, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
                       {req}
                     </li>
                   ))}
+                  {!(concours.conditions || '').trim() && (
+                    <li className="text-muted-foreground text-sm">Aucune condition spécifique renseignée.</li>
+                  )}
                 </ul>
               </div>
             </div>
@@ -147,7 +175,7 @@ export default function ConcoursDetail() {
               </div>
 
               <button
-                onClick={() => toast.success('Inscription en cours...', { description: 'Vous serez redirigé vers le formulaire.' })}
+                onClick={handleRegisterClick}
                 className="w-full gradient-hero text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-opacity"
               >
                 S'inscrire au concours

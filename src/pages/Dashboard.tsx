@@ -18,7 +18,7 @@ export default function Dashboard() {
     const loadOrders = async () => {
       try {
         const data = await getMyOrdersApi();
-        if (mounted) setOrders(data);
+        if (mounted) setOrders(Array.isArray(data) ? data : []);
       } catch (err: unknown) {
         if (mounted) {
           setOrders([]);
@@ -125,7 +125,7 @@ export default function Dashboard() {
               </div>
 
               <div className="space-y-3">
-                {order.items.map(item => (
+                {(Array.isArray(order.items) ? order.items : []).map(item => (
                   <div key={`${order.id}-${item.annale_id}`} className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
                       <FileText className="h-5 w-5 text-primary" />

@@ -33,9 +33,12 @@ export default function PageHero({
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">{description}</p>
         </div>
         {stats.length > 0 && (
-          <div className="mt-7 grid gap-3 sm:grid-cols-3">
+          <div className="mt-7 flex gap-4 w-full">
             {stats.map((stat) => (
-              <div key={stat.label} className="rounded-2xl border border-border/70 bg-background/70 px-4 py-3">
+              <div
+                key={stat.label}
+                className="flex-1 min-w-[160px] rounded-2xl border border-border/70 bg-background/70 px-4 py-3 flex flex-col justify-center items-start"
+              >
                 <p className="text-xl font-heading font-bold text-foreground md:text-2xl">{stat.value}</p>
                 <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">{stat.label}</p>
               </div>

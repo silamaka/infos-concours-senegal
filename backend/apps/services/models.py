@@ -28,3 +28,4 @@ class ServiceRequest(models.Model):
     attachment_file = models.FileField(upload_to='service_attachments/', null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="submitted")
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

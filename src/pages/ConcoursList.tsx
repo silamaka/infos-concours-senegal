@@ -14,6 +14,7 @@ export default function ConcoursList() {
   const [error, setError] = useState<string | null>(null);
   const [reloadTick, setReloadTick] = useState(0);
 
+
   useEffect(() => {
     let mounted = true;
     const loadConcours = async () => {
@@ -21,7 +22,8 @@ export default function ConcoursList() {
       setError(null);
       try {
         const data = await getConcoursApi();
-        if (mounted) setConcours(data);
+        // Compatibilité pagination DRF
+        if (mounted) setConcours(Array.isArray(data) ? data : (data?.results || []));
       } catch (err: unknown) {
         if (mounted) setConcours([]);
         if (mounted) setError(err instanceof Error ? err.message : 'Chargement des concours impossible.');
@@ -58,13 +60,15 @@ export default function ConcoursList() {
     return [...result].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [concours, search, category, sortBy]);
 
-  const openCount = concours.filter(c => c.status === 'Ouvert').length;
+  const openCount = concours.filter(c => (c.status || '').toLowerCase() === 'open').length;
   const categoriesCount = Math.max(categories.length - 1, 0);
-  const urgentCount = concours.filter((c) => {
-    const deadline = new Date(c.deadline).getTime();
-    const diffDays = (deadline - Date.now()) / (1000 * 60 * 60 * 24);
-    return Number.isFinite(diffDays) && diffDays >= 0 && diffDays <= 14;
+  // À venir : statut 'upcoming' ou 'à venir'
+  const upcomingCount = concours.filter(c => {
+    const s = (c.status || '').toLowerCase();
+    return s === 'upcoming' || s === 'à venir';
   }).length;
+  // Fermés : concours dont le statut est 'closed'
+  const closedCount = concours.filter(c => (c.status || '').toLowerCase() === 'closed').length;
 
   return (
     <div className="py-8 md:py-12 relative">
@@ -77,9 +81,10 @@ export default function ConcoursList() {
             title="Concours et opportunites a suivre"
             description="Reperez rapidement les concours ouverts, comparez les echeances et concentrez-vous sur les opportunites qui correspondent vraiment a votre parcours."
             stats={[
+              { label: 'catégories', value: String(categoriesCount) },
               { label: 'ouverts', value: String(openCount) },
-              { label: 'categories', value: String(categoriesCount) },
-              { label: 'urgents', value: String(urgentCount) },
+              { label: 'à venir', value: String(upcomingCount) },
+              { label: 'fermés', value: String(closedCount) },
             ]}
           />
         </div>
@@ -98,7 +103,7 @@ export default function ConcoursList() {
                 <CalendarClock className="h-4 w-4 text-secondary" />
                 Dates limites
               </div>
-              <p className="mt-2 text-sm text-muted-foreground">{urgentCount} opportunites ferment dans les 14 prochains jours.</p>
+              <p className="mt-2 text-sm text-muted-foreground">{closedCount} concours sont fermés.</p>
             </div>
             <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-foreground">

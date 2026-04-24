@@ -40,8 +40,10 @@ export default function Home() {
     };
   }, []);
 
-  const popularAnnales = annales.filter(a => a.isPopular).slice(0, 4);
-  const featuredConcours = concours.filter((c) => c.is_featured).slice(0, 3);
+  const annalesArray = Array.isArray(annales) ? annales : (annales?.results || []);
+  const popularAnnales = annalesArray.filter(a => a.isPopular).slice(0, 4);
+  const concoursArray = Array.isArray(concours) ? concours : (concours?.results || []);
+  const featuredConcours = concoursArray.filter((c) => c.is_featured).slice(0, 3);
 
   return (
     <div>
@@ -64,14 +66,7 @@ export default function Home() {
                 <ChevronRight className="h-3 w-3 opacity-60" />
               </div>
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-extrabold leading-[1.1] mb-5">
-                Réussissez vos{' '}
-                <span className="text-secondary relative">
-                  concours
-                  <svg className="absolute -bottom-1 left-0 w-full hidden md:block" viewBox="0 0 200 8" fill="none">
-                    <path d="M2 6C50 2 150 2 198 6" stroke="hsl(var(--secondary))" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
-                  </svg>
-                </span>{' '}
-                avec les meilleures annales
+                informations <span className="text-secondary">orientations</span> inscriptions documentations
               </h1>
               <p className="text-primary-foreground/80 text-base md:text-lg mb-8 leading-relaxed max-w-xl">
                 Accédez aux annales corrigées, suivez les concours ouverts et boostez vos chances de réussite. Tout en un seul endroit.

@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, ClipboardList, CreditCard, Gauge, MessageSquare, Trophy, UserCog, Users, Wrench, X } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const links = [
   { to: '/admin', label: 'Dashboard', icon: Gauge },
@@ -22,6 +23,7 @@ export default function AdminSidebar({
   onClose?: () => void;
 }) {
   const location = useLocation();
+  const { user } = useAuth();
 
   const isLinkActive = (to: string) => {
     if (to === '/admin') {
@@ -53,7 +55,9 @@ export default function AdminSidebar({
       </div>
 
       <nav className="p-3 space-y-1 overflow-y-auto">
-        {links.map((item) => {
+        {links
+          .filter((item) => (item.to === '/admin/users' ? user?.role === 'ADMIN' : true))
+          .map((item) => {
           const active = isLinkActive(item.to);
           return (
             <Link

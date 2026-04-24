@@ -22,7 +22,7 @@ vi.mock("@/contexts/CartContext", () => ({
 describe("Form accessibility labels", () => {
   it("register form fields are associated with labels", () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Register />
       </MemoryRouter>,
     );
@@ -44,7 +44,7 @@ describe("Form accessibility labels", () => {
 
   it("payment phone input is associated with label", () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Payment />
       </MemoryRouter>,
     );

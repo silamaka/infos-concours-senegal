@@ -4,6 +4,8 @@ from .models import Concours
 
 
 class ConcoursSerializer(serializers.ModelSerializer):
+    conditions = serializers.CharField(allow_blank=True, required=False, allow_null=False, default='')
+
     class Meta:
         model = Concours
         fields = [
@@ -12,6 +14,7 @@ class ConcoursSerializer(serializers.ModelSerializer):
             "category",
             "date",
             "description",
+            "registration_url",
             "location",
             "deadline",
             "status",
@@ -19,4 +22,5 @@ class ConcoursSerializer(serializers.ModelSerializer):
             "rating",
             "reviews",
             "is_featured",
+            "conditions",
         ]

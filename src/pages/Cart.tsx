@@ -11,7 +11,7 @@ export default function Cart() {
         <ShoppingBag className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
         <h1 className="text-2xl font-heading font-bold mb-2">Votre panier est vide</h1>
         <p className="text-muted-foreground mb-6">Ajoutez des annales pour commencer.</p>
-        <Link to="/annales" className="inline-flex items-center gap-2 gradient-hero text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+        <Link to="/annales" className="inline-flex items-center gap-2 gradient-hero text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
           Voir les annales <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
@@ -29,7 +29,7 @@ export default function Cart() {
           <h1 className="text-3xl font-heading font-bold">Mon panier ({totalItems})</h1>
         </div>
 
-        <div className="space-y-3 mb-8">
+        <div className="space-y-3 mb-8" aria-live="polite">
           {items.map(item => (
             <div key={`${item.type}-${item.id}`} className="flex items-center gap-4 bg-card/95 backdrop-blur-md border border-border rounded-2xl p-4 shadow-card hover:shadow-card-hover transition-shadow">
               <div className="flex-1 min-w-0">
@@ -37,16 +37,29 @@ export default function Cart() {
                 <p className="text-xs text-muted-foreground capitalize">{item.type}</p>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="h-7 w-7 flex items-center justify-center rounded border border-border hover:bg-muted transition-colors" aria-label={`Diminuer la quantite de ${item.title}`}>
+                <button
+                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                  className="h-7 w-7 flex items-center justify-center rounded border border-border hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  aria-label={`Diminuer la quantite de ${item.title}`}
+                  disabled={item.quantity <= 1}
+                >
                   <Minus className="h-3 w-3" />
                 </button>
                 <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
-                <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="h-7 w-7 flex items-center justify-center rounded border border-border hover:bg-muted transition-colors" aria-label={`Augmenter la quantite de ${item.title}`}>
+                <button
+                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                  className="h-7 w-7 flex items-center justify-center rounded border border-border hover:bg-muted transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  aria-label={`Augmenter la quantite de ${item.title}`}
+                >
                   <Plus className="h-3 w-3" />
                 </button>
               </div>
               <p className="text-sm font-bold text-primary w-24 text-right">{(item.price * item.quantity).toLocaleString('fr-FR')} F</p>
-              <button onClick={() => removeItem(item.id)} className="p-1.5 text-muted-foreground hover:text-accent transition-colors" aria-label={`Retirer ${item.title} du panier`}>
+              <button
+                onClick={() => removeItem(item.id)}
+                className="p-1.5 text-muted-foreground hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                aria-label={`Retirer ${item.title} du panier`}
+              >
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
@@ -64,7 +77,7 @@ export default function Cart() {
           </div>
           <Link
             to="/paiement"
-            className="inline-flex w-full items-center justify-center gap-2 text-center gradient-hero text-primary-foreground py-3 rounded-lg font-bold hover:opacity-90 transition-opacity"
+            className="inline-flex w-full items-center justify-center gap-2 text-center gradient-hero text-primary-foreground py-3 rounded-lg font-bold hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <CreditCard className="h-4 w-4" />
             Proceder au paiement

@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 export default function Payment() {
   const { items, totalPrice, clearCart } = useCart();
-  const [method, setMethod] = useState<'paydunya'>('paydunya');
+  const method = 'paydunya' as const;
   const [phone, setPhone] = useState('');
   const [success, setSuccess] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
@@ -26,12 +26,17 @@ export default function Payment() {
         throw new Error('Votre panier ne contient pas d\'annales valides pour la commande.');
       }
 
-      if (!phone.trim()) {
+      const normalizedPhone = phone.replace(/\s+/g, '').trim();
+      if (!normalizedPhone) {
         throw new Error('Veuillez renseigner votre numero de telephone.');
       }
 
+      if (!/^\+?\d{9,15}$/.test(normalizedPhone)) {
+        throw new Error('Le numero de telephone est invalide.');
+      }
+
       const order = await createOrderApi(orderItems);
-      const payment = await initiatePaymentApi(order.id, method, phone.trim());
+      const payment = await initiatePaymentApi(order.id, method, normalizedPhone);
       setPaymentUrl(payment.payment_url);
 
       if (payment.mock_mode && isMockPaymentEnabled) {
@@ -62,12 +67,16 @@ export default function Payment() {
             href={paymentUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex mb-6 gradient-hero text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+            className="inline-flex mb-6 gradient-hero text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             Ouvrir le lien de paiement
           </a>
         )}
-        
+        <div>
+          <Link to="/dashboard" className="text-primary text-sm font-semibold hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm">
+            Aller vers mon espace
+          </Link>
+        </div>
       </div>
     );
   }
@@ -76,7 +85,7 @@ export default function Payment() {
     return (
       <div className="container py-20 text-center">
         <p className="text-muted-foreground mb-4">Aucun article à payer.</p>
-        <Link to="/annales" className="text-primary text-sm hover:underline">← Voir les annales</Link>
+        <Link to="/annales" className="text-primary text-sm hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-sm">← Voir les annales</Link>
       </div>
     );
   }
@@ -124,14 +133,18 @@ export default function Payment() {
               onChange={e => setPhone(e.target.value)}
               placeholder="+221 7X XXX XX XX"
               autoComplete="tel"
+              inputMode="tel"
+              pattern="^\+?[0-9 ]{9,20}$"
+              aria-describedby="payment-phone-help"
               required
               className="w-full px-4 py-2.5 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
+            <p id="payment-phone-help" className="mt-1 text-xs text-muted-foreground">Format accepte: +221XXXXXXXXX</p>
           </div>
           <button
             type="submit"
-            disabled={submitting}
-            className="w-full gradient-hero text-primary-foreground py-3 rounded-lg font-bold hover:opacity-90 transition-opacity"
+            disabled={submitting || items.length === 0}
+            className="w-full gradient-hero text-primary-foreground py-3 rounded-lg font-bold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             {submitting ? 'Traitement en cours...' : `Payer ${totalPrice.toLocaleString('fr-FR')} FCFA`}
           </button>

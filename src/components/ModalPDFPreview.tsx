@@ -1,5 +1,6 @@
 import { X, Download, ShoppingCart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { useEffect, useRef } from 'react';
 
 interface ModalPDFPreviewProps {
   open: boolean;
@@ -15,15 +16,60 @@ interface ModalPDFPreviewProps {
 
 export default function ModalPDFPreview({ open, onClose, annale }: ModalPDFPreviewProps) {
   const { addItem } = useCart();
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Fermeture par touche Échap
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      // Focus trap
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    // Focus sur bouton fermer à l’ouverture
+    setTimeout(() => { closeBtnRef.current?.focus(); }, 100);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [open, onClose]);
 
   if (!open || !annale) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/50 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-card rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-auto animate-fade-in" onClick={e => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/50 backdrop-blur-sm"
+      onClick={onClose}
+      aria-modal="true"
+      role="dialog"
+      tabIndex={-1}
+    >
+      <div
+        ref={modalRef}
+        className="bg-card rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-auto animate-fade-in"
+        onClick={e => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h3 className="font-heading font-semibold">{annale.title}</h3>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-muted transition-colors">
+          <button
+            ref={closeBtnRef}
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-muted transition-colors"
+            aria-label="Fermer la fenêtre de prévisualisation"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -46,6 +92,7 @@ export default function ModalPDFPreview({ open, onClose, annale }: ModalPDFPrevi
             <button
               onClick={() => { addItem({ id: annale.id, title: annale.title, price: annale.price, type: 'annale' }); onClose(); }}
               className="flex-1 flex items-center justify-center gap-2 gradient-hero text-primary-foreground py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+              aria-label={`Ajouter ${annale.title} au panier`}
             >
               <ShoppingCart className="h-4 w-4" />
               Ajouter au panier

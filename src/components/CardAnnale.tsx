@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Star, Download } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
@@ -27,6 +28,11 @@ export default function CardAnnale({
   const { addItem } = useCart();
   const [imageError, setImageError] = useState(false);
   const showImage = Boolean(image) && !imageError;
+
+  const handleAdd = () => {
+    addItem({ id, title, price, type: 'annale' });
+    toast.success('Ajouté au panier', { description: title });
+  };
 
   return (
     <div className="group bg-card/95 backdrop-blur-md rounded-2xl border border-border shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden">
@@ -109,8 +115,9 @@ export default function CardAnnale({
             )}
           </div>
           <button
-            onClick={() => addItem({ id, title, price, type: 'annale' })}
+            onClick={handleAdd}
             className="inline-flex items-center gap-1.5 gradient-hero text-primary-foreground px-3.5 py-2 rounded-xl text-xs font-semibold hover:opacity-90 transition-opacity shrink-0"
+            aria-label={`Ajouter ${title} au panier`}
           >
             <ShoppingCart className="h-3.5 w-3.5" />
             Ajouter

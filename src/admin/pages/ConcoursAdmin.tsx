@@ -10,17 +10,28 @@ import {
 } from '@/utils/api';
 import { toast } from 'sonner';
 
-const statusOptions = ['upcoming', 'open', 'closed'];
+const statusOptions = [
+  { value: 'upcoming', label: 'À venir' },
+  { value: 'open', label: 'Ouvert' },
+  { value: 'closed', label: 'Fermé' },
+];
+
+function statusLabel(value?: string) {
+  const found = statusOptions.find(opt => opt.value === value);
+  return found ? found.label : value;
+}
 
 const initialForm: Partial<AdminConcours> = {
   title: '',
   category: '',
   date: '',
+  registration_url: '',
   location: '',
   deadline: '',
   status: 'upcoming',
   description: '',
   is_featured: false,
+  conditions: '',
 };
 
 export default function ConcoursAdmin() {
@@ -50,6 +61,7 @@ export default function ConcoursAdmin() {
     const title = (form.title ?? '').trim();
     const category = (form.category ?? '').trim();
     const location = (form.location ?? '').trim();
+    const registrationUrl = (form.registration_url ?? '').trim();
     const status = (form.status ?? 'upcoming').trim().toLowerCase();
     const description = (form.description ?? '').trim();
     const date = form.date ?? '';
@@ -63,6 +75,10 @@ export default function ConcoursAdmin() {
       toast.error('La deadline ne peut pas être après la date du concours.');
       return;
     }
+    if (registrationUrl && !/^https?:\/\//i.test(registrationUrl)) {
+      toast.error("Le lien d'inscription doit commencer par http:// ou https://");
+      return;
+    }
 
     const payload: Partial<AdminConcours> = {
       ...form,
@@ -73,17 +89,22 @@ export default function ConcoursAdmin() {
       location,
       status,
       description,
+      registration_url: registrationUrl,
       image: (form.image ?? '').trim(),
       is_featured: !!form.is_featured,
     };
 
     try {
+      let concoursResult: AdminConcours | undefined;
       if (editingId) {
-        await updateAdminConcoursApi(editingId, payload);
+        concoursResult = await updateAdminConcoursApi(editingId, payload);
         toast.success('Concours mis à jour');
       } else {
-        await createAdminConcoursApi(payload);
+        concoursResult = await createAdminConcoursApi(payload);
         toast.success('Concours créé');
+      }
+      if (!concoursResult) {
+        toast.error("Erreur API admin : réponse inattendue. Vérifiez l’authentification et le backend.");
       }
       setForm(initialForm);
       setEditingId(null);
@@ -99,6 +120,7 @@ export default function ConcoursAdmin() {
       ...item,
       image: item.image ?? '',
       description: item.description ?? '',
+      registration_url: item.registration_url ?? '',
       status: item.status ?? 'upcoming',
     });
   };
@@ -199,10 +221,14 @@ export default function ConcoursAdmin() {
               <input value={form.location ?? ''} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} placeholder="Ex: Dakar" className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background text-sm" required />
               </div>
               <div>
+              <label className="text-xs text-muted-foreground">Lien d'inscription</label>
+              <input value={form.registration_url ?? ''} onChange={(e) => setForm((p) => ({ ...p, registration_url: e.target.value }))} placeholder="https://site-concours.sn/inscription" className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background text-sm" />
+              </div>
+              <div>
               <label className="text-xs text-muted-foreground">Statut</label>
               <select value={form.status ?? 'upcoming'} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))} className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background text-sm" required>
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>{status}</option>
+                {statusOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
               </div>
@@ -212,6 +238,15 @@ export default function ConcoursAdmin() {
               </div>
               <div className="md:col-span-2 flex items-center gap-4 text-sm">
                 <label className="inline-flex items-center gap-1"><input type="checkbox" checked={!!form.is_featured} onChange={(e) => setForm((p) => ({ ...p, is_featured: e.target.checked }))} /> Afficher sur l'accueil</label>
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-xs text-muted-foreground">Pièces à Fournir <span className="text-muted-foreground text-[11px]">(une par ligne)</span></label>
+                <textarea
+                  value={form.conditions ?? ''}
+                  onChange={e => setForm((p) => ({ ...p, conditions: e.target.value }))}
+                  placeholder="Ex: Carte d'identité\nDossier complet\nPhoto d'identité"
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-input bg-background text-sm min-h-[80px]"
+                />
               </div>
             </div>
           </div>
@@ -283,7 +318,7 @@ export default function ConcoursAdmin() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-muted-foreground border-b border-border">
-                <th className="py-2">Image</th><th className="py-2">Titre</th><th className="py-2">Catégorie</th><th className="py-2">Date</th><th className="py-2">Statut</th><th className="py-2">Accueil</th><th className="py-2">Actions</th>
+                <th className="py-2">Image</th><th className="py-2">Titre</th><th className="py-2">Catégorie</th><th className="py-2">Date</th><th className="py-2">Statut</th><th className="py-2">Conditions</th><th className="py-2">Accueil</th><th className="py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -297,7 +332,8 @@ export default function ConcoursAdmin() {
                   <td className="py-2">{item.title}</td>
                   <td className="py-2">{item.category}</td>
                   <td className="py-2">{item.date}</td>
-                  <td className="py-2">{item.status}</td>
+                  <td className="py-2">{statusLabel(item.status)}</td>
+                  <td className="py-2 max-w-xs truncate" title={item.conditions || ''}>{(item.conditions || '').split('\n').filter(Boolean).slice(0,3).join(' | ') || <span className="text-muted-foreground">—</span>}</td>
                   <td className="py-2">
                     <button
                       type="button"
