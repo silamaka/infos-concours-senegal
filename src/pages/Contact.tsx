@@ -66,9 +66,9 @@ export default function Contact() {
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-semibold px-4 py-1.5 rounded-full mb-5 uppercase tracking-wider">
               <MessageCircle className="h-4 w-4" /> Contact prioritaire
             </div>
-            <h1 className="text-3xl md:text-5xl font-heading font-extrabold mb-4 leading-tight">On est là pour vous aider</h1>
+            <h1 className="text-3xl md:text-5xl font-heading font-extrabold mb-4 leading-tight">Écris-nous, on est là pour toi !</h1>
             <p className="text-muted-foreground max-w-xl text-base md:text-lg leading-relaxed">
-              Une question sur les annales, les concours ou vos services ? Ecrivez-nous et recevez une reponse claire, utile et rapide.
+              Une question, un doute ou juste envie d’échanger ? Écris-nous, on te répond avec des conseils concrets et adaptés à ta situation.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">Reponse &lt; 24h</span>

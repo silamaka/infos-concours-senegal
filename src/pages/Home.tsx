@@ -69,7 +69,7 @@ export default function Home() {
                 informations <span className="text-secondary">orientations</span> inscriptions documentations
               </h1>
               <p className="text-primary-foreground/80 text-base md:text-lg mb-8 leading-relaxed max-w-xl">
-                Accédez aux annales corrigées, suivez les concours ouverts et boostez vos chances de réussite. Tout en un seul endroit.
+                Prépare-toi à réussir ! Découvre toutes les annales corrigées, reste informé sur les concours ouverts et donne-toi toutes les chances de briller. Tout est réuni ici, pour toi.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link

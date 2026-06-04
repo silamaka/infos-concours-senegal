@@ -10,9 +10,27 @@ const services = [
 ];
 
 const testimonials = [
-  { name: 'Fatou D.', role: 'Candidate Gendarmerie', text: 'Mon CV a été complètement transformé. J\'ai décroché 3 entretiens en une semaine !', rating: 5, avatar: 'F' },
-  { name: 'Mamadou S.', role: 'Candidat ENA', text: 'La lettre de motivation était parfaitement adaptée au concours. Très professionnel.', rating: 5, avatar: 'M' },
-  { name: 'Aissatou B.', role: 'Étudiante', text: 'Service rapide et de qualité. Je recommande à 100%. Design incroyable !', rating: 4, avatar: 'A' },
+  {
+    name: 'Silamaka D.',
+    role: 'Candidat Gendarmerie',
+    text: 'Grâce à vous, mon CV a fait la différence : 3 entretiens en une semaine, dont la Gendarmerie !',
+    rating: 5,
+    avatar: 'S',
+  },
+  {
+    name: 'René S.',
+    role: 'Candidat ENA',
+    text: 'Lettre de motivation sur-mesure, parfaite pour l’ENA. Service rapide et sérieux.',
+    rating: 5,
+    avatar: 'R',
+  },
+  {
+    name: 'Nabou F.',
+    role: 'Étudiante',
+    text: 'J’ai commandé un design pour mon dossier de candidature : résultat super pro, livraison rapide, et l’équipe a vraiment pris le temps de m’écouter et de comprendre mon besoin. Je recommande à 100 % à tous ceux qui veulent un service sérieux et humain !',
+    rating: 4,
+    avatar: 'N',
+  },
 ];
 
 const stats = [
