@@ -11,6 +11,16 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
     },
+    // Proxy optionnel pour développement
+    // Permet d'appeler /api/v1/* qui sera proxifié vers http://localhost:8000/api/v1/*
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        // Décommenter pour debug
+        // logLevel: 'debug',
+      },
+    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

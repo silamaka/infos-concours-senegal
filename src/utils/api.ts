@@ -1,4 +1,14 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
+/**
+ * Configuration de l'URL de base de l'API
+ * 
+ * Développement: http://localhost:8000/api/v1 (voir .env)
+ * Production: /api/v1 (proxy Nginx vers Django sur 127.0.0.1:8000)
+ * 
+ * Les variables d'environnement VITE_API_URL sont définies dans :
+ * - .env (développement)
+ * - .env.production (build production)
+ */
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
 
 const ACCESS_TOKEN_KEY = "auth_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
