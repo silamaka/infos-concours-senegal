@@ -25,7 +25,7 @@ def _load_env_file() -> None:
 _load_env_file()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-secret-key")
-DEBUG = True
+DEBUG = env_bool("DEBUG", True)
 
 
 def env_bool(name: str, default: bool) -> bool:
@@ -38,8 +38,23 @@ def env_bool(name: str, default: bool) -> bool:
 if not DEBUG and SECRET_KEY == "dev-only-secret-key":
     raise ImproperlyConfigured("SECRET_KEY must be set in production")
 
-default_allowed_hosts = "localhost,127.0.0.1" if DEBUG else ""
+# Configuration ALLOWED_HOSTS
+# En développement: localhost et 127.0.0.1
+# En production: charger depuis ALLOWED_HOSTS (voir .env.production)
+if DEBUG:
+    default_allowed_hosts = "localhost,127.0.0.1"
+else:
+    # En production, ALLOWED_HOSTS DOIT être défini dans .env.production
+    default_allowed_hosts = ""
+
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", default_allowed_hosts).split(",") if h.strip()]
+
+# Vérification de sécurité en production
+if not DEBUG and not ALLOWED_HOSTS:
+    raise ImproperlyConfigured(
+        "ALLOWED_HOSTS must be set in production via .env or environment variables. "
+        "Example: ALLOWED_HOSTS=infosconcours.sn,www.infosconcours.sn"
+    )
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -121,13 +136,31 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
-_default_cors_origins = "http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080"
+# ========================================
+# Configuration CORS
+# ========================================
+# CORS_ALLOWED_ORIGINS: domaines autorisés pour les requêtes cross-origin
+# Développement: localhost:5173 (frontend Vite), localhost:8080
+# Production: https://infosconcours.sn, https://www.infosconcours.sn
+if DEBUG:
+    _default_cors_origins = "http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://127.0.0.1:8080"
+else:
+    _default_cors_origins = "https://infosconcours.sn,https://www.infosconcours.sn"
+
 CORS_ALLOWED_ORIGINS = [
     origin.strip() for origin in os.getenv("CORS_ALLOWED_ORIGINS", _default_cors_origins).split(",") if origin.strip()
 ]
 CORS_ALLOW_CREDENTIALS = env_bool("CORS_ALLOW_CREDENTIALS", True)
 
-_default_csrf_trusted = "http://localhost:5173,http://127.0.0.1:5173"
+# ========================================
+# Configuration CSRF
+# ========================================
+# CSRF_TRUSTED_ORIGINS: domaines autorisés pour les tokens CSRF
+if DEBUG:
+    _default_csrf_trusted = "http://localhost:5173,http://127.0.0.1:5173"
+else:
+    _default_csrf_trusted = "https://infosconcours.sn,https://www.infosconcours.sn"
+
 CSRF_TRUSTED_ORIGINS = [
     origin.strip() for origin in os.getenv("CSRF_TRUSTED_ORIGINS", _default_csrf_trusted).split(",") if origin.strip()
 ]
