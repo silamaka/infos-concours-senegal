@@ -282,3 +282,26 @@ else:
             "LOCATION": "senegal-exam-hub",
         }
     }
+
+# ========================================
+# Upload Files Configuration
+# ========================================
+# Limites de taille pour les uploads (résout erreur 413)
+# Par défaut: 2.5 MB, nous augmentons à 50 MB pour les images/PDFs
+
+# Taille max en mémoire avant sauvegarde sur disque: 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+
+# Taille max pour les données POST: 50 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
+
+# Nombre max de champs: 10000 (défaut: 1000)
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
+
+# Taille max par fichier upload: 50 MB
+FILE_UPLOAD_MAX_SIZE = 50 * 1024 * 1024  # 50 MB
+
+# Répertoire temporaire pour les uploads
+FILE_UPLOAD_TEMP_DIR = BASE_DIR / "tmp"
+if not FILE_UPLOAD_TEMP_DIR.exists():
+    FILE_UPLOAD_TEMP_DIR.mkdir(parents=True, exist_ok=True)
